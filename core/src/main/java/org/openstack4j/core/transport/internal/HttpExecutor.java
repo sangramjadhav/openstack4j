@@ -29,8 +29,12 @@ public class HttpExecutor  {
         Iterator<HttpExecutorService> it = ServiceLoader.load(HttpExecutorService.class, getClass().getClassLoader()).iterator();
         if (!it.hasNext())
         {
-            LOG.error("No OpenStack4j connector found in classpath");
-            throw new ConnectorNotFoundException("No OpenStack4j connector found in classpath");
+			// Load from OSGi managed Registry
+            it = org.openstack4j.osgi.ConnectorRegistry.fromRegistry().iterator();
+			if(!it.hasNext()){
+				LOG.error("No OpenStack4j connector found in classpath");
+				throw new ConnectorNotFoundException("No OpenStack4j connector found in classpath");
+			}
         }
         return service = it.next();
     }
